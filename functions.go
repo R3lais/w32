@@ -1025,6 +1025,7 @@ func DialogBox(hInstance HINSTANCE, lpTemplateName *uint16, hWndParent HWND, lpD
 
 func GetDlgItem(hDlg HWND, nIDDlgItem int) HWND {
 	ret, _, _ := getDlgItem.Call(
+		// nolint
 		uintptr(unsafe.Pointer(hDlg)),
 		uintptr(nIDDlgItem),
 	)
@@ -1036,9 +1037,12 @@ func DrawIconEx(
 	frame uint, flickerFreeDraw HBRUSH, flags uint,
 ) bool {
 	ret, _, _ := drawIconEx.Call(
+		// nolint
 		uintptr(unsafe.Pointer(hDC)),
+		// nolint
 		uintptr(x),
 		uintptr(y),
+		// nolint
 		uintptr(unsafe.Pointer(hIcon)),
 		uintptr(width),
 		uintptr(height),
@@ -1051,6 +1055,7 @@ func DrawIconEx(
 
 func DrawIcon(hDC HDC, x, y int, hIcon HICON) bool {
 	ret, _, _ := drawIcon.Call(
+		// nolint
 		uintptr(unsafe.Pointer(hDC)),
 		uintptr(x),
 		uintptr(y),
@@ -2489,10 +2494,11 @@ func ControlService(service HANDLE, control uint32, serviceStatus *SERVICE_STATU
 	return ret != 0
 }
 
+/*
+adjust the func abit to set the size
+*/
 func InitCommonControlsEx(lpInitCtrls *INITCOMMONCONTROLSEX) bool {
-	if lpInitCtrls != nil {
-		lpInitCtrls.size = 8
-	}
+	lpInitCtrls.SIZE = uint32(unsafe.Sizeof(lpInitCtrls))
 	ret, _, _ := initCommonControlsEx.Call(uintptr(unsafe.Pointer(lpInitCtrls)))
 	return ret != 0
 }
@@ -3555,7 +3561,9 @@ func (t FontType) String() string {
 func EnumFontFamiliesEx(hdc HDC, font LOGFONT, f func(font *ENUMLOGFONTEX, metric *ENUMTEXTMETRIC, fontType FontType) bool) {
 	callback := syscall.NewCallback(func(font, metric uintptr, typ uint32, _ uintptr) uintptr {
 		if f(
+			// nolint
 			(*ENUMLOGFONTEX)(unsafe.Pointer(font)),
+			// nolint
 			(*ENUMTEXTMETRIC)(unsafe.Pointer(metric)),
 			FontType(typ),
 		) {
@@ -3655,6 +3663,7 @@ func GlobalFree(hMem HGLOBAL) {
 
 func GlobalLock(hMem HGLOBAL) unsafe.Pointer {
 	ret, _, _ := globalLock.Call(uintptr(hMem))
+	// nolint
 	return unsafe.Pointer(ret)
 }
 
@@ -3692,6 +3701,7 @@ func SizeofResource(hModule HMODULE, hResInfo HRSRC) uint32 {
 
 func LockResource(hResData HGLOBAL) unsafe.Pointer {
 	ret, _, _ := lockResource.Call(uintptr(hResData))
+	// nolint
 	return unsafe.Pointer(ret)
 }
 
@@ -3703,10 +3713,11 @@ func LoadResource(hModule HMODULE, hResInfo HRSRC) HGLOBAL {
 	return HGLOBAL(ret)
 }
 
+/*	removed and using a modyfied version in utils.go
 func GetLastError() uint32 {
 	ret, _, _ := getLastError.Call()
 	return uint32(ret)
-}
+}*/
 
 func OpenProcess(desiredAccess uint32, inheritHandle bool, processId uint32) HANDLE {
 	inherit := 0
@@ -4045,6 +4056,7 @@ func SysAllocString(v string) (ss *int16) {
 	pss, _, _ := sysAllocString.Call(
 		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(v))),
 	)
+	// nolint
 	ss = (*int16)(unsafe.Pointer(pss))
 	return
 }
@@ -4408,6 +4420,7 @@ func GdiplusStartup(input *GdiplusStartupInput, output *GdiplusStartupOutput) (t
 }
 
 func MakeIntResource(id uint16) *uint16 {
+	// nolint
 	return (*uint16)(unsafe.Pointer(uintptr(id)))
 }
 

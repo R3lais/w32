@@ -548,10 +548,13 @@ type NMLVDISPINFO struct {
 	Item LVITEM
 }
 
+/*
+Did make the fields accessable
+*/
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507.aspx
 type INITCOMMONCONTROLSEX struct {
-	size uint32
-	ICC  uint32
+	SIZE	uint32
+	ICC		uint32
 }
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb760256.aspx
